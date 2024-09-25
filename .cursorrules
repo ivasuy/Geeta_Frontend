@@ -1,0 +1,110 @@
+You are an expert in React, JavaScript, React Router, Spring Boot, Styled Components, and MongoDB.
+Code Style and Structure
+
+Write concise, modular React and JavaScript code with clear examples.
+Use functional and declarative programming patterns; avoid classes where possible.
+Favor reusable and composable components.
+Use descriptive variable names with auxiliary verbs (e.g., isFetchingData, hasErrorOccurred).
+Structure files into components, hooks, helpers, constants, utility functions, and route components.
+Naming Conventions
+
+Use lowercase with dashes for directories (e.g., components/user-profile).
+Favor named exports for components, hooks, and route components.
+React, React Router, and JavaScript
+Usage
+
+Use ES6+ features (e.g., arrow functions, destructuring).
+Prefer functional components with hooks over class components.
+Use hooks for state management (e.g., useState, useEffect) and custom hooks for shared logic.
+Avoid useEffect for tasks better handled by context, server-side data fetching, or custom hooks.
+React Router
+
+Use React Router for client-side routing.
+Use BrowserRouter for wrapping the application and Routes with Route for defining routes.
+Implement code-splitting with React.lazy and Suspense for lazy-loaded routes.
+Use nested routes for hierarchical views and dynamic route parameters for detail views.
+Favor declarative routing (e.g., <Link> over history.push).
+Use Outlet for nested route rendering in layout components.
+Syntax and Formatting
+
+Use concise syntax for conditionals and loops.
+Use declarative JSX; avoid inline styles and complex logic within JSX.
+UI and Styling with Styled Components
+Code Style and Structure
+
+Define styled components at the top of the component file.
+Use consistent naming for styled components (e.g., StyledButton).
+Break down complex styles into smaller styled components.
+Naming Conventions
+
+Use PascalCase for styled components (e.g., StyledHeader).
+Use descriptive prop names for styling variations (e.g., isPrimary).
+Usage
+
+Utilize theme providers for consistent theming across components.
+Use CSS grid and flexbox within styled components for layout.
+Implement responsive design using media queries within styled components.
+Apply CSS-in-JS best practices to avoid unnecessary re-renders due to inline styles.
+Performance Optimization in React
+Minimize useEffect and setState; prefer memoization (React.memo, useMemo).
+Optimize rendering using React's Suspense and lazy loading for components and routes.
+Optimize images: use WebP format, include size data, implement lazy loading.
+Key Conventions
+
+Use context for global state management if necessary.
+Optimize for React's Reconciliation process; avoid deep prop drilling.
+Follow React, JavaScript, and React Router best practices for data fetching, state management, and routing.
+Spring Boot
+Code Style and Structure
+
+Write clean and modular Spring Boot code with concise examples.
+Use a layered architecture (Controller, Service, Repository) for separation of concerns.
+Use descriptive method and variable names (e.g., getUserById, userRepository).
+Naming Conventions
+
+Use camelCase for method and variable names, PascalCase for class names.
+Use descriptive package names (e.g., com.example.user.service).
+Java and Spring Boot Usage
+
+Use dependency injection for managing beans and services.
+Prefer @Service, @Repository, and @Controller annotations for class roles.
+Use @RequestMapping for RESTful endpoint mapping.
+Implement exception handling using @ControllerAdvice.
+Syntax and Formatting
+
+Follow standard Java formatting conventions (e.g., 4-space indentation).
+Use concise syntax for conditionals and method chaining.
+Performance Optimization
+
+Optimize database queries using pagination and projection.
+Cache frequently accessed data using Spring Cache.
+Use asynchronous processing for non-blocking operations (e.g., @Async).
+Key Conventions
+
+Use DTOs for transferring data between layers.
+Secure endpoints using Spring Security.
+MongoDB
+Code Style and Structure
+
+Use Mongoose for schema definition and data modeling.
+Use descriptive names for collections and fields.
+Naming Conventions
+
+Use camelCase for field names and collection names in MongoDB.
+Use PascalCase for model names (e.g., UserModel).
+Usage
+
+Define schemas with Mongoose and use validation where necessary.
+Use indexing to optimize queries.
+Prefer aggregate functions for complex data retrieval.
+Performance Optimization
+
+Optimize queries using indexes and projections.
+Use lean queries (.lean()) for better performance.
+Key Conventions
+
+Use environment variables for database connection strings.
+Handle database connection errors gracefully.
+General Best Practices
+Follow MVC architecture in Spring Boot and component-based architecture in React.
+Use environment variables for configuration and sensitive data.
