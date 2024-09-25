@@ -288,7 +288,7 @@ export default function Home() {
       try {
         const randomChapter = Math.floor(Math.random() * 18) + 1;
         const response = await axios.get(
-          `http://localhost:8083/api/gita/chapter/${randomChapter}`
+          `https://geetabackend-production.up.railway.app/api/gita/chapter/${randomChapter}`
         );
         const chapter = response.data;
         const verses = response.data.verses;
@@ -306,7 +306,7 @@ export default function Home() {
         let fetchedChapters = [];
         for (let i = 1; i <= 18; i++) {
           const response = await axios.get(
-            `http://localhost:8083/api/gita/chapter/${i}`
+            `https://geetabackend-production.up.railway.app/api/gita/chapter/${i}`
           );
           fetchedChapters.push({
             number: response.data.number,

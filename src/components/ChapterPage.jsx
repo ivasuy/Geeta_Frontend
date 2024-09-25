@@ -321,7 +321,7 @@ export default function ChapterPage() {
     const fetchChapter = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8083/api/gita/chapter/${chapterId}`
+          `https://geetabackend-production.up.railway.app/api/gita/chapter/${chapterId}`
         );
         setChapter(response.data);
       } catch (error) {
@@ -332,7 +332,7 @@ export default function ChapterPage() {
     const fetchComments = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8083/api/gita/chapter/${chapterId}/comments`
+          `https://geetabackend-production.up.railway.app/api/gita/chapter/${chapterId}/comments`
         );
         setComments(response.data);
       } catch (error) {
@@ -377,7 +377,7 @@ export default function ChapterPage() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `http://localhost:8083/api/gita/chapter/${chapterId}/comment`,
+        `https://geetabackend-production.up.railway.app/api/gita/chapter/${chapterId}/comment`,
         {
           userName,
           comment: commentText,
