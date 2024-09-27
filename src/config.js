@@ -1,5 +1,5 @@
 const config = {
-  apiUrl: "https://geetabackend-production.up.railway.app",
+  apiUrl: "https://sunny-dream-production.up.railway.app/",
   // "http://localhost:8083",
 };
 
