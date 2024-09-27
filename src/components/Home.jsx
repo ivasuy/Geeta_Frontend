@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
 import PageContainer from "./PageContainer";
+import config from "../config";
+import LanguageSelector from "./LanguageSelector";
 
 const Experience = styled.section`
   text-align: center;
@@ -24,30 +26,20 @@ const Subtitle = styled.p`
   margin-bottom: 1rem;
 `;
 
-const StartButton = styled.button`
-  background-color: #ff7f50;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 4px;
-`;
-
 const VerseOfDay = styled.section`
   background-color: white;
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
-  width: 60%;
+  width: 50%;
   height: 120px;
   height: auto;
   margin-left: auto;
   margin-right: auto;
   position: relative;
   @media (max-width: 768px) {
-    width: 90%;
+    width: 70%;
     padding: 1rem;
   }
 `;
@@ -60,7 +52,7 @@ const VerseTitle = styled.h3`
 `;
 
 const VerseParagraph = styled.p`
-  /* font-style: italic; */
+  font-style: italic;
   margin-bottom: 0.5rem;
   color: #555;
   font-size: 1.1rem;
@@ -72,25 +64,6 @@ const VerseReference = styled.p`
   color: #8b4513;
   font-weight: bold;
 `;
-
-// const SeeMoreButton = styled.button`
-//   background-color: transparent;
-//   color: #ff8c00;
-//   border: none;
-//   font-size: 0.9rem;
-//   cursor: pointer;
-//   font-weight: bold;
-//   text-transform: uppercase;
-//   position: absolute;
-//   bottom: 2rem;
-//   left: 1rem;
-
-//   @media (max-width: 480px) {
-//     font-size: 0.75rem;
-//     bottom: 2rem;
-//     left: 0.4rem;
-//   }
-// `;
 
 const ChapterSlider = styled.div`
   position: relative;
@@ -151,6 +124,7 @@ const ChapterCard = styled.div`
     width: 50%;
     left: calc(50% - 25%);
     height: 280px;
+    padding-bottom: 60px;
   }
 `;
 
@@ -172,6 +146,9 @@ const ChapterContent = styled.div`
     font-size: 1.3rem;
     margin-top: 0;
     margin-bottom: 0.5rem;
+  }
+  @media (max-width: 768px) {
+    justify-content: space-between;
   }
 `;
 
@@ -198,6 +175,15 @@ const ReadButton = styled.button`
   width: 100%;
   align-self: center;
   margin-top: 1rem;
+
+  @media (max-width: 768px) {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    width: calc(100% - 2rem);
+    margin-top: 0;
+  }
 `;
 
 const VerseCount = styled.p`
@@ -279,51 +265,97 @@ export default function Home() {
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [randomVerse, setRandomVerse] = useState(null);
   const [randomChapter, setRandomChapter] = useState(null);
+  const [language, setLanguage] = useState(null);
   const navigate = useNavigate();
-
   const sliderRef = useRef(null);
 
+  const getTranslation = (englishText, hindiText) => {
+    return language === "hindi" ? hindiText : englishText;
+  };
+
   useEffect(() => {
-    const fetchVerseOfTheDay = async () => {
+    const storedLanguage = localStorage.getItem("preferredLanguage");
+    if (storedLanguage) {
+      setLanguage(storedLanguage);
+    }
+  }, []);
+
+  const handleLanguageSelect = (selectedLanguage) => {
+    setLanguage(selectedLanguage);
+    localStorage.setItem("preferredLanguage", selectedLanguage);
+  };
+
+  useEffect(() => {
+    if (language) {
+      fetchAllChapters();
+      fetchVerseOfTheDay();
+    }
+  }, [language]);
+
+  const fetchAllChapters = async () => {
+    try {
+      const chapterPromises = Array.from({ length: 18 }, (_, index) =>
+        axios.get(
+          `${config.apiUrl}/api/gita${
+            language === "hindi" ? "/chapter/hindi" : "/chapter"
+          }/${index + 1}`
+        )
+      );
+      const responses = await Promise.all(chapterPromises);
+      const chaptersData = responses.map((response) => ({
+        number: response.data.number,
+        title: response.data.title,
+        verses: response.data.verses.length,
+        summary: response.data.summary,
+      }));
+      setChapters(chaptersData);
+    } catch (error) {
+      console.error("Error fetching chapters:", error);
+    }
+  };
+
+  const fetchVerseOfTheDay = async () => {
+    const storedVerse = localStorage.getItem("verseOfTheDay");
+    const storedTimestamp = localStorage.getItem("verseTimestamp");
+    const currentTimestamp = new Date().getTime();
+    const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+
+    if (
+      storedVerse &&
+      storedTimestamp &&
+      currentTimestamp - storedTimestamp < oneDayInMilliseconds
+    ) {
+      const storedVerseData = JSON.parse(storedVerse);
+      setRandomVerse(storedVerseData.randomVerse);
+      setRandomChapter(storedVerseData.randomChapter);
+    } else {
       try {
         const randomChapter = Math.floor(Math.random() * 18) + 1;
         const response = await axios.get(
-          `https://geetabackend-production.up.railway.app/api/gita/chapter/${randomChapter}`
+          `${config.apiUrl}/api/gita${
+            language === "hindi" ? "/chapter/hindi" : "/chapter"
+          }/${randomChapter}`
         );
         const chapter = response.data;
-        const verses = response.data.verses;
+        const verses = chapter.verses;
         const randomVerseIndex = Math.floor(Math.random() * verses.length);
-        setRandomVerse(verses[randomVerseIndex]);
+        const newRandomVerse = verses[randomVerseIndex];
+        setRandomVerse(newRandomVerse);
         setRandomChapter(chapter);
+
+        localStorage.setItem(
+          "verseOfTheDay",
+          JSON.stringify({
+            randomVerse: newRandomVerse,
+            randomChapter: chapter,
+          })
+        );
+        localStorage.setItem("verseTimestamp", currentTimestamp.toString());
       } catch (error) {
         console.error("Error fetching random verse:", error);
       }
-      console.log(randomVerse);
-    };
-
-    const fetchChapters = async () => {
-      try {
-        let fetchedChapters = [];
-        for (let i = 1; i <= 18; i++) {
-          const response = await axios.get(
-            `https://geetabackend-production.up.railway.app/api/gita/chapter/${i}`
-          );
-          fetchedChapters.push({
-            number: response.data.number,
-            title: response.data.title,
-            verses: response.data.verses.length,
-            summary: response.data.summary,
-          });
-        }
-        setChapters(fetchedChapters);
-      } catch (error) {
-        console.error("Error fetching chapters:", error);
-      }
-    };
-
-    fetchVerseOfTheDay();
-    fetchChapters();
-  }, []);
+    }
+  };
 
   useEffect(() => {
     if (chapters.length > 0) {
@@ -369,46 +401,66 @@ export default function Home() {
 
   return (
     <PageContainer>
-      <Experience>
-        <ExperienceTitle>Experience the Gita</ExperienceTitle>
-        <Subtitle>Timeless Wisdom for Modern Life</Subtitle>
-        {/* <StartButton>Start Reading</StartButton> */}
-      </Experience>
-      <VerseOfDay>
-        <VerseTitle>Verse of the day</VerseTitle>
-        {randomVerse && (
-          <>
-            <VerseParagraph>"{randomVerse.translation}"</VerseParagraph>
-            <VerseReference>
-              - Chapter {randomChapter.number}, Verse {randomVerse.verseNumber}
-            </VerseReference>
-            {/* <SeeMoreButton>See More</SeeMoreButton> */}
-          </>
-        )}
-      </VerseOfDay>
-      {chapters.length > 0 && (
+      {!language && (
+        <LanguageSelector onSelectLanguage={handleLanguageSelect} />
+      )}
+      {language && (
         <>
-          <ChapterNavigation>
-            <NavButton onClick={handlePreviousChapter}>&lt;</NavButton>
-            <ChapterSlider ref={sliderRef}>
-              {chapters.map((chapter, index) => (
-                <ChapterCard key={chapter.number}>
-                  <ChapterHeader>Chapter {chapter.number}</ChapterHeader>
-                  <ChapterContent>
-                    <h4>{chapter.title}</h4>
-                    <SummaryText>{chapter.summary}</SummaryText>
-                    <VerseCount>{chapter.verses} verses</VerseCount>
-                    <ReadButton
-                      onClick={() => handleReadChapter(chapter.number)}
-                    >
-                      Read Chapter
-                    </ReadButton>
-                  </ChapterContent>
-                </ChapterCard>
-              ))}
-            </ChapterSlider>
-            <NavButton onClick={handleNextChapter}>&gt;</NavButton>
-          </ChapterNavigation>
+          <Experience>
+            <ExperienceTitle>
+              {getTranslation("Experience the Gita", "गीता का अनुभव करें")}
+            </ExperienceTitle>
+            <Subtitle>
+              {getTranslation(
+                "Timeless Wisdom for Modern Life",
+                "आधुनिक जीवन के लिए शाश्वत ज्ञान"
+              )}
+            </Subtitle>
+          </Experience>
+          <VerseOfDay>
+            <VerseTitle>
+              {getTranslation("Verse of the day", "आज का श्लोक")}
+            </VerseTitle>
+            {randomVerse && (
+              <>
+                <VerseParagraph>"{randomVerse.translation}"</VerseParagraph>
+                <VerseReference>
+                  - {getTranslation("Chapter", "अध्याय")} {randomChapter.number}
+                  , {getTranslation("Verse", "श्लोक")} {randomVerse.verseNumber}
+                </VerseReference>
+              </>
+            )}
+          </VerseOfDay>
+          {chapters.length > 0 && (
+            <>
+              <ChapterNavigation>
+                <NavButton onClick={handlePreviousChapter}>&lt;</NavButton>
+                <ChapterSlider ref={sliderRef}>
+                  {chapters.map((chapter) => (
+                    <ChapterCard key={chapter.number}>
+                      <ChapterHeader>
+                        {" "}
+                        {getTranslation("Chapter", "अध्याय")} {chapter.number}
+                      </ChapterHeader>
+                      <ChapterContent>
+                        <h4>{chapter.title}</h4>
+                        <SummaryText>{chapter.summary}</SummaryText>
+                        <VerseCount>
+                          {chapter.verses} {getTranslation("verses", "श्लोक")}
+                        </VerseCount>
+                        <ReadButton
+                          onClick={() => handleReadChapter(chapter.number)}
+                        >
+                          {getTranslation("Read Chapter", "अध्याय पढ़ें")}
+                        </ReadButton>
+                      </ChapterContent>
+                    </ChapterCard>
+                  ))}
+                </ChapterSlider>
+                <NavButton onClick={handleNextChapter}>&gt;</NavButton>
+              </ChapterNavigation>
+            </>
+          )}
         </>
       )}
     </PageContainer>

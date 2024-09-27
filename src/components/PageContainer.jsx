@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -16,12 +16,22 @@ const MainContent = styled.main`
   flex: 1;
 `;
 
-const PageContainer = ({ children }) => (
-  <Container>
-    <Header />
-    <MainContent>{children}</MainContent>
-    <Footer />
-  </Container>
-);
+const PageContainer = ({ children }) => {
+  const [language, setLanguage] = useState("english");
+
+  useEffect(() => {
+    const storedLanguage = localStorage.getItem("preferredLanguage");
+    if (storedLanguage) {
+      setLanguage(storedLanguage);
+    }
+  }, []);
+  return (
+    <Container>
+      <Header language={language} />
+      <MainContent>{children}</MainContent>
+      <Footer language={language} />
+    </Container>
+  );
+};
 
 export default PageContainer;

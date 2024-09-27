@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
 import PageContainer from "./PageContainer";
+import config from "../config";
 
 const ChapterContainer = styled.div`
   padding: 2rem;
@@ -308,6 +309,8 @@ export default function ChapterPage() {
   const [userName, setUserName] = useState("");
   const [commentText, setCommentText] = useState("");
   const [currentCommentPage, setCurrentCommentPage] = useState(1);
+  const language = localStorage.getItem("preferredLanguage");
+
   const commentsPerPage = 5;
   const indexOfLastComment = currentCommentPage * commentsPerPage;
   const indexOfFirstComment = indexOfLastComment - commentsPerPage;
@@ -315,31 +318,43 @@ export default function ChapterPage() {
     indexOfFirstComment,
     indexOfLastComment
   );
-
   const totalCommentPages = Math.ceil(comments.length / commentsPerPage);
+
+  const getTranslation = (englishText, hindiText) => {
+    return language === "hindi" ? hindiText : englishText;
+  };
+
+  useEffect(() => {
+    const storedLanguage = localStorage.getItem("preferredLanguage");
+    // if (storedLanguage) {
+    //   setLanguage(storedLanguage);
+    // }
+  }, []);
+
   useEffect(() => {
     const fetchChapter = async () => {
       try {
         const response = await axios.get(
-          `https://geetabackend-production.up.railway.app/api/gita/chapter/${chapterId}`
+          `${config.apiUrl}/api/gita${
+            language === "hindi" ? "/chapter/hindi" : "/chapter"
+          }/${chapterId}`
         );
+        console.log(response.data);
         setChapter(response.data);
       } catch (error) {
         console.error("Error fetching chapter:", error);
       }
     };
-
     const fetchComments = async () => {
       try {
         const response = await axios.get(
-          `https://geetabackend-production.up.railway.app/api/gita/chapter/${chapterId}/comments`
+          `${config.apiUrl}/api/gita/chapter/${chapterId}/comments`
         );
         setComments(response.data);
       } catch (error) {
         console.error("Error fetching comments:", error);
       }
     };
-
     fetchChapter();
     fetchComments();
   }, [chapterId]);
@@ -377,7 +392,7 @@ export default function ChapterPage() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `https://geetabackend-production.up.railway.app/api/gita/chapter/${chapterId}/comment`,
+        `${config.apiUrl}/api/gita/chapter/${chapterId}/comment`,
         {
           userName,
           comment: commentText,
@@ -408,15 +423,22 @@ export default function ChapterPage() {
         <>
           <ChapterContainer>
             <ChapterHeader>
-              <ChapterNumber>CHAPTER {chapter.number}</ChapterNumber>
+              <ChapterNumber>
+                {getTranslation("CHAPTER", "अध्याय")} {chapter.number}
+              </ChapterNumber>
               <ChapterTitle>{chapter.title}</ChapterTitle>
             </ChapterHeader>
             <ChapterSummary>{chapter.summary}</ChapterSummary>
-            <VerseCount>Total Verses: {chapter.verses.length}</VerseCount>
+            <VerseCount>
+              {getTranslation("Total Verses:", "कुल श्लोक:")}{" "}
+              {chapter.verses.length}
+            </VerseCount>
             <VerseList>
               {paginatedVerses.map((verse) => (
                 <VerseCard key={verse.verseNumber}>
-                  <VerseHeader>Verse {verse.verseNumber}</VerseHeader>
+                  <VerseHeader>
+                    {getTranslation("Verse", "श्लोक")} {verse.verseNumber}
+                  </VerseHeader>
                   <VerseContent>{verse.shlok}</VerseContent>
                   <VerseTranslation>{verse.translation}</VerseTranslation>
                 </VerseCard>
@@ -435,28 +457,36 @@ export default function ChapterPage() {
           </ChapterContainer>
 
           <InsightsSection>
-            <SectionTitle>Share Your Insights</SectionTitle>
+            <SectionTitle>
+              {getTranslation("Share Your Insights", "अपने विचार साझा करें")}
+            </SectionTitle>
             <InsightForm onSubmit={handleSubmitComment}>
               <Input
                 type="text"
-                placeholder="Your Name"
+                placeholder={getTranslation("Your Name", "आपका नाम")}
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 required
               />
               <Textarea
-                placeholder="Share what you've learned from this chapter..."
+                placeholder={getTranslation(
+                  "Share what you've learned from this chapter...",
+                  "इस अध्याय से आपने क्या सीखा, साझा करें..."
+                )}
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 required
               />
-              <SubmitButton type="submit">Submit Comment</SubmitButton>
+              <SubmitButton type="submit">
+                {getTranslation("Submit Comment", "टिप्पणी जमा करें")}
+              </SubmitButton>
             </InsightForm>
           </InsightsSection>
 
           <InsightsSection>
             <SectionTitle>
-              Community Insights ({comments.length} comments)
+              {getTranslation("Community Insights", "समुदाय के विचार")} (
+              {comments.length} {getTranslation("comments", "टिप्पणियाँ")})
             </SectionTitle>
             {currentComments.map((comment, index) => (
               <InsightCard key={index}>
@@ -477,7 +507,8 @@ export default function ChapterPage() {
                 &lt;
               </NavButton>
               <span>
-                Page {currentCommentPage} of {totalCommentPages}
+                {getTranslation("Page", "पृष्ठ")} {currentCommentPage}{" "}
+                {getTranslation("of", "का")} {totalCommentPages}
               </span>
               <NavButton
                 onClick={handleNextCommentPage}

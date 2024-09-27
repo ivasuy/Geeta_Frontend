@@ -37,12 +37,17 @@ const StyledLink = styled(Link)`
   text-decoration: none;
 `;
 
-const Header = () => (
-  <HeaderContainer>
-    <StyledLink to="/">
-      <Title>Bhagavad Gita</Title>
-    </StyledLink>
-  </HeaderContainer>
-);
+const Header = ({ language }) => {
+  const getTranslation = (englishText, hindiText) => {
+    return language === "hindi" ? hindiText : englishText;
+  };
+  return (
+    <HeaderContainer>
+      <StyledLink to="/">
+        <Title> {getTranslation("Bhagavad Gita", "श्रीमद्भगवद्गीता")}</Title>
+      </StyledLink>
+    </HeaderContainer>
+  );
+};
 
 export default Header;
