@@ -337,7 +337,8 @@ export default function ChapterPage() {
         const response = await axios.get(
           `${config.apiUrl}/api/gita${
             language === "hindi" ? "/chapter/hindi" : "/chapter"
-          }/${chapterId}`
+          }/${chapterId}`,
+          { withCredentials: true }
         );
         console.log(response.data);
         setChapter(response.data);
