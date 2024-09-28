@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
 import PageContainer from "./PageContainer";
-import { useHistory } from "react-router-dom";
 import config from "../config";
 
 const ChapterContainer = styled.div`
@@ -302,7 +301,7 @@ const InsightContent = styled.p`
 `;
 
 export default function ChapterPage() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { chapterId } = useParams();
   const [chapter, setChapter] = useState(null);
   const [currentVersePage, setCurrentVersePage] = useState(0);
@@ -376,12 +375,12 @@ export default function ChapterPage() {
 
   const handleNextChapter = () => {
     const nextChapterId = (parseInt(chapterId) % 18) + 1;
-    history.push(`/chapter/${nextChapterId}`);
+    navigate(`/chapter/${nextChapterId}`);
   };
 
   const handlePreviousChapter = () => {
     const prevChapterId = (parseInt(chapterId) - 1 + 18) % 18 || 18;
-    history.push(`/chapter/${prevChapterId}`);
+    navigate(`/chapter/${prevChapterId}`);
   };
 
   const paginatedVerses = chapter
