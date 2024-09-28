@@ -19,19 +19,37 @@ const Dialog = styled.div`
   padding: 2rem;
   border-radius: 8px;
   text-align: center;
-  width: 25%;
-  height: 18%;
+  width: 90%;
+  max-width: 400px;
+  box-sizing: border-box;
+
+  @media (min-width: 768px) {
+    width: 50%;
+    max-width: none;
+  }
 `;
 
 const Title = styled.h2`
   padding: 0;
   margin-bottom: 1rem;
+  font-size: 1.5rem;
+
+  @media (min-width: 768px) {
+    font-size: 2rem;
+  }
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
-  justify-content: center;
-  gap: 2rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: center;
+    gap: 2rem;
+  }
 `;
 
 const Button = styled.button`
@@ -43,9 +61,15 @@ const Button = styled.button`
   border: none;
   border-radius: 4px;
   transition: background-color 0.3s;
+  width: 100%;
+  max-width: 200px;
 
   &:hover {
     background-color: #f9551a;
+  }
+
+  @media (min-width: 768px) {
+    width: auto;
   }
 `;
 
